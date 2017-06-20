@@ -39,6 +39,9 @@ Route::group(array('prefix' => 'api', 'middleware' => 'cors'), function()
 	{
 		Route::post('login', array('uses' => 'BusquedasController@login'));
 		Route::get('busquedaAutorizaciones', array('uses' => 'BusquedasController@getAutorizaciones'));
+    Route::get('busquedaUnidades', array('uses' => 'BusquedasController@getUnidades'));
+    Route::get('cliente', array('uses' => 'BusquedasController@cliente'));
+    Route::get('riesgo', array('uses' => 'BusquedasController@riesgo'));
 
 	});
 
