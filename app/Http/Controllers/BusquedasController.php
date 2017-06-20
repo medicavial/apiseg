@@ -31,7 +31,7 @@ class BusquedasController extends Controller
     {
            
         return Unidad::where('Uni_activa','S')
-                        ->select('Uni_clave','Uni_nombrecorto')
+                        ->select('Uni_clave as id','Uni_nombrecorto as nombre')
                         ->get();
     }
 
