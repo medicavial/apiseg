@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Input;
 use App\Http\models\Usuario;
+use App\Http\models\Unidad;
 class BusquedasController extends Controller
 {
     /**
@@ -26,6 +27,14 @@ class BusquedasController extends Controller
        
     }
 
+    public function getUnidades()
+    {
+           
+        return Unidad::where('Uni_activa','S')
+                        ->select('Uni_clave as id','Uni_nombrecorto as nombre')
+                        ->get();
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -37,6 +46,8 @@ class BusquedasController extends Controller
         $password = Input::get('psw');         
         return DB::select("select * from Usuario where Usu_login='".$usuario."' and Usu_pwd='".md5($password)."'");//
     }
+
+
 
     /**
      * Store a newly created resource in storage.
