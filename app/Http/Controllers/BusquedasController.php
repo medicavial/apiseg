@@ -11,6 +11,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Http\models\Usuario;
 use App\Http\models\Unidad;
+use App\Http\models\AutorizacionMedica;
+use App\Http\models\PUAutorizacionesMedicas;
 class BusquedasController extends Controller
 {
     /**
@@ -28,11 +30,42 @@ class BusquedasController extends Controller
     }
 
     public function getUnidades()
-    {
-           
+    {           
         return Unidad::where('Uni_activa','S')
-                        ->select('Uni_clave as id','Uni_nombrecorto as nombre')
-                        ->get();
+                ->select('Uni_clave as id','Uni_nombrecorto as nombre')
+                ->get();
+    }
+
+    public function getAutMV($fechaIni, $fechaFin)
+    {           
+
+        $listadoMV= AutorizacionMedica::whereBetween('AUM_fechaReg',[$fechaIni, $fechaFin.' 23:59:59']) 
+                ->join('MovimientoAut', 'AutorizacionMedica.AUM_clave', '=', 'MovimientoAut.AUM_clave') 
+                ->join('TipoMovimiento', 'MovimientoAut.TIM_claveint', '=', 'TipoMovimiento.TIM_claveint') 
+
+                ->select('AUM_folioMV as FOLIO', 'AUM_lesionado AS LESIONADO', 'AUM_fechaReg AS FECHAREG', 'TIM_nombre AS MOVIMIENTO',
+                    DB::raw("CONCAT(AutorizacionMedica.AUM_clave,'-',MovimientoAut.TIM_claveint) as AUT"), DB::raw( "'PAQUETE' AS 'TIPO'"))                                     
+                ->get();
+        $listadoZima= PUAutorizacionesMedicas::whereBetween('Aut_fecreg',[$fechaIni, $fechaFin.' 23:59:59'])
+                    ->join('PURegistro', 'PUAutorizacionesMedicas.REG_folio', '=', 'PURegistro.REG_folio') 
+                    ->join('PUTipoAutorizacion','PUAutorizacionesMedicas.TipAut_clave','=','PUTipoAutorizacion.TipAut_clave')
+                    ->select('PUAutorizacionesMedicas.REG_folio as FOLIO', 'REG_nombrecompleto AS LESIONADO', 'Aut_fecreg AS FECHAREG', 'TipAut_nombre AS MOVIMIENTO', 'Aut_clave AS AUT', DB::raw("'INSUMOS' AS 'TIPO'"))
+                    ->get();
+        $arryaListoMV   = json_decode($listadoMV);
+        $arryaListoZima = json_decode($listadoZima);
+
+        $autorizaciones = array_merge($arryaListoMV,$arryaListoZima);
+
+        $autorizacionesJson = json_encode($autorizaciones);
+
+        return $autorizacionesJson;
+    }
+
+    public function getAutZima()
+    {           
+       return Unidad::where('Uni_activa','S')
+                ->select('Uni_clave as id','Uni_nombrecorto as nombre')
+                ->get();
     }
 
     /**
