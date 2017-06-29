@@ -44,7 +44,17 @@ Route::group(array('prefix' => 'api', 'middleware' => 'cors'), function()
     Route::get('busquedaAutZima', array('uses' => 'BusquedasController@getAutZima'));
     Route::get('cliente', array('uses' => 'BusquedasController@cliente'));   
     Route::get('riesgo', array('uses' => 'BusquedasController@riesgo'));
+    Route::get('posicion', array('uses' => 'BusquedasController@posicion'));
+    Route::get('buscatipoDifusion', array('uses' => 'BusquedasController@buscatipoDifusion'));
 
 	});
+
+    Route::group(array('prefix' => 'Oportunidades', 'middleware' => 'cors'), function()
+  {
+
+    Route::post('insertaOportunidad', array('uses' => 'RegistroOportunidadesController@insertaOportunidad'));
+
+
+  });
 
 });

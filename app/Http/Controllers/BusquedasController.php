@@ -93,6 +93,18 @@ class BusquedasController extends Controller
         return DB::select("SELECT RIE_clave as id, RIE_nombre as nombre FROM RiesgoAfectado WHERE RIE_activo = 'S'");//
     }
 
+    public function posicion()
+    {
+      
+        return DB::select("SELECT id, opcion FROM PosicionAcc WHERE id IN (1,2,3,4,5)");
+    }
+
+    public function buscatipoDifusion()
+    {
+      
+        return DB::select("SELECT TPD_id AS id, TDP_nombre AS nombre FROM TipoDifucion WHERE TDP_activo = 1");
+    }
+
 
 
     /**
