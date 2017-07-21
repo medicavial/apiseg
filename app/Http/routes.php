@@ -45,6 +45,13 @@ Route::group(array('prefix' => 'api', 'middleware' => 'cors'), function()
     Route::get('buscaDetalleAutorizacion/{aut}/{tipo}', array('uses' => 'BusquedasController@DetalleAutorizacion'));
     Route::get('cliente', array('uses' => 'BusquedasController@cliente'));   
     Route::get('riesgo', array('uses' => 'BusquedasController@riesgo'));
+    Route::get('posicion', array('uses' => 'BusquedasController@posicion'));
+    Route::get('buscatipoDifusion', array('uses' => 'BusquedasController@buscatipoDifusion'));
+    Route::get('listadoOportunidades', array('uses' => 'BusquedasController@listadoOportunidades'));
+    Route::post('buscaOportunidades', array('uses' => 'BusquedasController@buscaOportunidades'));
+    Route::post('detalleOportunidad/{folio}', array('uses' => 'BusquedasController@detalleOportunidad'));
+    Route::post('cerrarAP/{folio}', array('uses' => 'BusquedasController@cerrarAP'));
+
 
 	});
 
@@ -52,6 +59,10 @@ Route::group(array('prefix' => 'api', 'middleware' => 'cors'), function()
   {
     Route::post('insertaCita', array('uses' => 'ProcesoController@insertCita'));    
     Route::post('subirDocumentos/{unidad}/{fecha}', array('uses' => 'ProcesoController@subirDocumentos'));    
+    Route::group(array('prefix' => 'Oportunidades', 'middleware' => 'cors'), function()
+  {
+
+    Route::post('insertaOportunidad', array('uses' => 'RegistroOportunidadesController@insertaOportunidad'));
 
   });
 
