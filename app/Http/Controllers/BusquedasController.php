@@ -25,7 +25,29 @@ class BusquedasController extends Controller
     {
 
       
-      return 'hola mundo';
+     $listadoMV= AutorizacionMedica::whereBetween('AUM_fechaReg',[$fechaIni, $fechaFin.' 23:59:59']) 
+                ->join('MovimientoAut', 'AutorizacionMedica.AUM_clave', '=', 'MovimientoAut.AUM_clave') 
+                ->join('TipoMovimiento', 'MovimientoAut.TIM_claveint', '=', 'TipoMovimiento.TIM_claveint')
+                ->join('Expediente','AutorizacionMedica.AUM_folioMV','=', 'Expediente.Exp_folio')
+                ->join('Unidad','Expediente.Uni_clave','=','Unidad.Uni_clave')
+                ->join('Compania','Expediente.Cia_clave','=','Compania.Cia_clave') 
+                ->join('Producto','Expediente.Pro_clave','=','Producto.Pro_clave')
+                ->select('AUM_folioMV as FOLIO', 'AUM_lesionado AS LESIONADO', 'AUM_fechaReg AS FECHAREG', 'TIM_nombre AS MOVIMIENTO',
+                    DB::raw("CONCAT(AutorizacionMedica.AUM_clave,'-',MovimientoAut.TIM_claveint) as AUT"),'AUM_diagnostico AS DIAG','MOA_texto as OBS','Uni_nombrecorto as UNIDAD','Cia_nombrecorto as ASEG','Expediente.Cia_clave AS CIACLAVE','MOA_estimacionActual AS ESTIMACION','Exp_telefono as TEL','Pro_img AS IMG', DB::raw( "'PAQUETE' AS 'TIPO'"))                                     
+                ->get();
+        $listadoZima= PUAutorizacionesMedicas::whereBetween('Aut_fecreg',[$fechaIni, $fechaFin.' 23:59:59'])
+                    ->join('PURegistro', 'PUAutorizacionesMedicas.REG_folio', '=', 'PURegistro.REG_folio') 
+                    ->join('PUTipoAutorizacion','PUAutorizacionesMedicas.TipAut_clave','=','PUTipoAutorizacion.TipAut_clave')
+                    ->select('PUAutorizacionesMedicas.REG_folio as FOLIO', 'REG_nombrecompleto AS LESIONADO', 'Aut_fecreg AS FECHAREG', 'TipAut_nombre AS MOVIMIENTO', 'Aut_clave AS AUT','Aut_dx AS DIAG','Aut_obs AS OBS' , DB::raw("'INSUMOS' AS 'TIPO'"))
+                    ->get();
+        $arryaListoMV   = json_decode($listadoMV);
+        $arryaListoZima = json_decode($listadoZima);
+
+        $autorizaciones = array_merge($arryaListoMV,$arryaListoZima);
+
+        $autorizacionesJson = json_encode($autorizaciones);
+
+        return $autorizacionesJson;
        
     }
 
@@ -41,15 +63,18 @@ class BusquedasController extends Controller
 
         $listadoMV= AutorizacionMedica::whereBetween('AUM_fechaReg',[$fechaIni, $fechaFin.' 23:59:59']) 
                 ->join('MovimientoAut', 'AutorizacionMedica.AUM_clave', '=', 'MovimientoAut.AUM_clave') 
-                ->join('TipoMovimiento', 'MovimientoAut.TIM_claveint', '=', 'TipoMovimiento.TIM_claveint') 
-
-                ->select('AUM_folioMV as FOLIO', 'AUM_lesionado AS LESIONADO', 'AUM_fechaReg AS FECHAREG', 'TIM_nombre AS MOVIMIENTO',
-                    DB::raw("CONCAT(AutorizacionMedica.AUM_clave,'-',MovimientoAut.TIM_claveint) as AUT"), DB::raw( "'PAQUETE' AS 'TIPO'"))                                     
+                ->join('TipoMovimiento', 'MovimientoAut.TIM_claveint', '=', 'TipoMovimiento.TIM_claveint')
+                ->join('Expediente','AutorizacionMedica.AUM_folioMV','=', 'Expediente.Exp_folio')
+                ->join('Unidad','Expediente.Uni_clave','=','Unidad.Uni_clave')
+                ->join('Compania','Expediente.Cia_clave','=','Compania.Cia_clave') 
+                ->join('Producto','Expediente.Pro_clave','=','Producto.Pro_clave')
+                ->select('AUM_folioMV as FOLIO', 'AUM_lesionado AS LESIONADO', 'AUM_fechaReg AS FECHAREG', 'TIM_nombre AS MOVIMIENTO','MovimientoAut.TIM_claveint as CVE_MOVIMIENTO',
+                    DB::raw("CONCAT(AutorizacionMedica.AUM_clave,'-',MovimientoAut.TIM_claveint) as AUT"),'AUM_diagnostico AS DIAG','MOA_texto as OBS','Uni_nombrecorto as UNIDAD','Cia_nombrecorto as ASEG','Expediente.Cia_clave AS CIACLAVE','MOA_estimacionActual AS ESTIMACION','Exp_telefono as TEL','Pro_img AS IMG', DB::raw( "'PAQUETE' AS 'TIPO'"))                                     
                 ->get();
         $listadoZima= PUAutorizacionesMedicas::whereBetween('Aut_fecreg',[$fechaIni, $fechaFin.' 23:59:59'])
                     ->join('PURegistro', 'PUAutorizacionesMedicas.REG_folio', '=', 'PURegistro.REG_folio') 
                     ->join('PUTipoAutorizacion','PUAutorizacionesMedicas.TipAut_clave','=','PUTipoAutorizacion.TipAut_clave')
-                    ->select('PUAutorizacionesMedicas.REG_folio as FOLIO', 'REG_nombrecompleto AS LESIONADO', 'Aut_fecreg AS FECHAREG', 'TipAut_nombre AS MOVIMIENTO', 'Aut_clave AS AUT', DB::raw("'INSUMOS' AS 'TIPO'"))
+                    ->select('PUAutorizacionesMedicas.REG_folio as FOLIO', 'REG_nombrecompleto AS LESIONADO', 'Aut_fecreg AS FECHAREG', 'TipAut_nombre AS MOVIMIENTO', 'Aut_clave AS AUT','Aut_dx AS DIAG','Aut_obs AS OBS', 'PUTipoAutorizacion.TipAut_clave AS CVE_MOVIMIENTO', DB::raw("'INSUMOS' AS 'TIPO'"))
                     ->get();
         $arryaListoMV   = json_decode($listadoMV);
         $arryaListoZima = json_decode($listadoZima);
@@ -66,6 +91,18 @@ class BusquedasController extends Controller
        return Unidad::where('Uni_activa','S')
                 ->select('Uni_clave as id','Uni_nombrecorto as nombre')
                 ->get();
+    }
+
+    public function DetalleAutorizacion($aut, $tipo)
+    {        
+
+       if($tipo=='PAQUETE')
+       {
+            return 'MEDICAVIAL';
+       }else
+       {
+            return 'ZIMA';
+       }
     }
 
     /**

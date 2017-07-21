@@ -38,13 +38,21 @@ Route::group(array('prefix' => 'api', 'middleware' => 'cors'), function()
 	Route::group(array('prefix' => 'busqueda', 'middleware' => 'cors'), function()
 	{
 		Route::post('login', array('uses' => 'BusquedasController@login'));
-		Route::get('busquedaAutorizaciones', array('uses' => 'BusquedasController@getAutorizaciones'));
+		Route::get('busquedaAutorizaciones/{fechaIni}/{fechaFin}', array('uses' => 'BusquedasController@getAutorizaciones'));
     Route::get('busquedaUnidades', array('uses' => 'BusquedasController@getUnidades'));
     Route::get('busquedaAutMV/{fechaIni}/{fechaFin}', array('uses' => 'BusquedasController@getAutMV'));
     Route::get('busquedaAutZima', array('uses' => 'BusquedasController@getAutZima'));
+    Route::get('buscaDetalleAutorizacion/{aut}/{tipo}', array('uses' => 'BusquedasController@DetalleAutorizacion'));
     Route::get('cliente', array('uses' => 'BusquedasController@cliente'));   
     Route::get('riesgo', array('uses' => 'BusquedasController@riesgo'));
 
 	});
+
+  Route::group(array('prefix' => 'proceso', 'middleware' => 'cors'), function()
+  {
+    Route::post('insertaCita', array('uses' => 'ProcesoController@insertCita'));    
+    Route::post('subirDocumentos/{unidad}/{fecha}', array('uses' => 'ProcesoController@subirDocumentos'));    
+
+  });
 
 });
