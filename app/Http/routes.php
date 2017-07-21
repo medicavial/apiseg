@@ -46,6 +46,11 @@ Route::group(array('prefix' => 'api', 'middleware' => 'cors'), function()
     Route::get('riesgo', array('uses' => 'BusquedasController@riesgo'));
     Route::get('posicion', array('uses' => 'BusquedasController@posicion'));
     Route::get('buscatipoDifusion', array('uses' => 'BusquedasController@buscatipoDifusion'));
+    Route::get('listadoOportunidades', array('uses' => 'BusquedasController@listadoOportunidades'));
+    Route::post('buscaOportunidades', array('uses' => 'BusquedasController@buscaOportunidades'));
+    Route::post('detalleOportunidad/{folio}', array('uses' => 'BusquedasController@detalleOportunidad'));
+    Route::post('cerrarAP/{folio}', array('uses' => 'BusquedasController@cerrarAP'));
+
 
 	});
 

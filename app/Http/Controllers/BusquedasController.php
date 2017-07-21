@@ -13,6 +13,7 @@ use App\Http\models\Usuario;
 use App\Http\models\Unidad;
 use App\Http\models\AutorizacionMedica;
 use App\Http\models\PUAutorizacionesMedicas;
+use App\Http\models\RegistroOportunidades;
 class BusquedasController extends Controller
 {
     /**
@@ -105,7 +106,76 @@ class BusquedasController extends Controller
         return DB::select("SELECT TPD_id AS id, TDP_nombre AS nombre FROM TipoDifucion WHERE TDP_activo = 1");
     }
 
+    public function listadoOportunidades()
+    {
+      
+        return DB::select("SELECT Cia_nombrecorto as cliente, Uni_nombrecorto as unidad, EXP_folio as folioMV, 
+                                   RGO_nombre as lesionado, RGO_fechaRep as fechaReporte, RGO_folio as folioOP, if(RGO_notifica = 1, 'SI','NO') as notifica,
+                                   if(RGO_estatus = 1, 'Abierto' ,'Cerrado') as estatus    
+                            FROM RegistroOportunidades
+                            INNER JOIN Unidad ON RegistroOportunidades.Uni_clave = Unidad.Uni_clave
+                            INNER JOIN Compania ON RegistroOportunidades.Cia_clave = Compania.Cia_clave
+                            INNER JOIN TipoDifucion ON RegistroOportunidades.RGO_tipo = TipoDifucion.TPD_id
+                            WHERE  RGO_estatus = 1
+                            limit 100");
+    }
 
+    public function buscaOportunidades()
+    {
+
+        $fechaIni = Input::get('fechaini');
+        $fechaFin = Input::get('fechafin');
+        $unidad   = Input::get('unidad');
+
+        if ($unidad == '') {
+
+
+            return DB::select("SELECT Cia_nombrecorto as cliente, Uni_nombrecorto as unidad, EXP_folio as folioMV, 
+                           RGO_nombre as lesionado, RGO_fechaRep as fechaReporte, RGO_folio as folioOP, if(RGO_notifica = 1, 'SI','NO') as notifica,    
+                           if(RGO_estatus = 1, 'Abierto' ,'Cerrado') as estatus
+                           FROM RegistroOportunidades
+                    INNER JOIN Unidad ON RegistroOportunidades.Uni_clave = Unidad.Uni_clave
+                    INNER JOIN Compania ON RegistroOportunidades.Cia_clave = Compania.Cia_clave
+                    INNER JOIN TipoDifucion ON RegistroOportunidades.RGO_tipo = TipoDifucion.TPD_id
+                    WHERE RGO_estatus = 1");
+            # code...
+        }else{
+      
+            return DB::select("SELECT Cia_nombrecorto as cliente, Uni_nombrecorto as unidad, EXP_folio as folioMV, 
+                                   RGO_nombre as lesionado, RGO_fechaRep as fechaReporte, RGO_folio as folioOP, if(RGO_notifica = 1, 'SI','NO') as notifica,    
+                                   if(RGO_estatus = 1, 'Abierto' ,'Cerrado') as estatus
+                                   FROM RegistroOportunidades
+                            INNER JOIN Unidad ON RegistroOportunidades.Uni_clave = Unidad.Uni_clave
+                            INNER JOIN Compania ON RegistroOportunidades.Cia_clave = Compania.Cia_clave
+                            INNER JOIN TipoDifucion ON RegistroOportunidades.RGO_tipo = TipoDifucion.TPD_id
+                            WHERE RGO_fechaRep BETWEEN '$fechaIni' and '$fechaFin 23:59:59' and RegistroOportunidades.Uni_clave = $unidad and RGO_estatus = 1");
+        }
+    }
+
+
+    public function detalleOportunidad($folio)
+    {
+      
+        return DB::select("SELECT Cia_nombrecorto as cliente, Uni_nombrecorto as unidad, EXP_folio as folioMV, 
+                                         RGO_nombre as lesionado, RGO_fechaRep as fechaReporte, RGO_folio as folioOP, if(RGO_notifica = 1, 'SI','NO') as notifica,    
+                                         if(RGO_estatus = 1, 'Abierto' ,'Cerrado') as estatus, Usu_nombre as usuario,
+                                         RGO_observaciones as notas
+                                         FROM RegistroOportunidades
+                            INNER JOIN Unidad ON RegistroOportunidades.Uni_clave = Unidad.Uni_clave
+                            INNER JOIN Compania ON RegistroOportunidades.Cia_clave = Compania.Cia_clave
+                            INNER JOIN TipoDifucion ON RegistroOportunidades.RGO_tipo = TipoDifucion.TPD_id
+                            INNER JOIN Usuario ON RegistroOportunidades.USU_registro = Usuario.Usu_login
+                            WHERE RGO_folio = '$folio'");
+    }
+
+    public function cerrarAP($folio)
+    {
+
+        $actualiza = DB::table('RegistroOportunidades')->where('RGO_folio', $folio)
+                                                       ->update(array('RGO_estatus' => 0));
+
+
+    }
 
     /**
      * Store a newly created resource in storage.

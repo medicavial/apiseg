@@ -58,7 +58,7 @@ class RegistroOportunidadesController extends Controller
 
         $cadena = $primeras."O".date('ym');
         $numero = str_pad($max,  3, "0",STR_PAD_LEFT); 
-        $folioO = $cadena.$numero+1;
+        $folioO = $cadena.$numero;
 
 
 
@@ -87,6 +87,7 @@ class RegistroOportunidadesController extends Controller
         $oportunidades->USU_registro = $usuario;
         $oportunidades->RGO_fechaReg = date('y-m-d H:i:s');
         $oportunidades->RGO_recepcion = $tipo;
+        $oportunidades->RGO_estatus = 1;
 
         $oportunidades->save();
 
